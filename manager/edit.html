@@ -105,31 +105,35 @@
                 <div class="form-group">
                   <label for="heroName" class="col-sm-2 control-label">姓名</label>
                   <div class="col-sm-10">
-                    <input required type="text" class="form-control" id="heroName" name="heroName" placeholder="请输入姓名"
-                      value="盖伦" />
+                    <input required type="text" class="form-control" id="heroName" name="heroName"
+                      placeholder="请输入姓名" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="heroNickName" class="col-sm-2 control-label">昵称</label>
+                  <div class="col-sm-10">
+                    <input required type="text" class="form-control" id="heroNickName" name="heroNickName"
+                      placeholder="请输入昵称" />
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="skillName" class="col-sm-2 control-label">技能</label>
                   <div class="col-sm-10">
-                    <input required type="text" class="form-control" id="skillName" name="skillName" placeholder="请输入技能"
-                      value="躲草丛" />
+                    <input required type="text" class="form-control" id="skillName" name="skillName"
+                      placeholder="请输入技能" />
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="heroIcon" class="col-sm-2 control-label">头像</label>
                   <div class="col-sm-10">
-                    <img src="lib/img/盖伦.png" alt="">
                     <input required type="file" class="file-input" id="heroIcon" name="heroIcon" />
                     <!-- 预览的标签 -->
-                    <img src="./images/盖伦.png" class="preview" alt="" />
+                    <img src="#" class="preview" alt="" />
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary btn-save">
-                      保存
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-save">保存</button>
                     <button type="submit" class="btn btn-cancel">取消</button>
                   </div>
                 </div>
@@ -142,6 +146,59 @@
   </div>
   <script src="./lib/bootstrap/js/jquery-1.12.4.js"></script>
   <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
+
+
+  <!-- -----------------------------修改英雄信息----------------------------------- -->
+  <!-- 获取要修改的英雄信息 -->
+  <script>
+    // 获取地址栏的id
+    var id = location.search;
+    // 发送ajax请求到/getHeroById端口，获取信息
+    $.get('/getHeroById' + id, function (res) {
+      $('#heroName').val(res.name);
+      $('#heroNickName').val(res.nickname);
+      $('#skillName').val(res.skill);
+      $('.preview').attr('src', res.file);
+      $('input[type=hidden]').val(res.id);
+    })
+  </script>
+
+  <!-- 图片预览效果 -->
+  <script>
+    $('#heroIcon').change(function () {
+      var fileObj = this.files[0];
+      var url = URL.createObjectURL(fileObj);
+      $('.preview').attr('src', url);
+    })
+  </script>
+
+  <!-- 点击保存修改信息 -->
+  <script>
+    $('.btn-save').click(function (e) {
+      console.log(123);
+      
+      e.preventDefault();
+      var fd = new FormData($('form')[0]);
+      console.log(12);
+      
+      $.ajax({
+        type: 'post',
+        url: '/updateHero',
+        data: fd,
+        dataType: 'json',
+        success: function (res) {
+          console.log(res);
+          
+          alert(res.message);
+          if (res.code == 200) {
+            location.href = './index.html'
+          }
+        },
+        processData: false,
+        contentType: false
+      })
+    })
+  </script>
 </body>
 
 </html>
