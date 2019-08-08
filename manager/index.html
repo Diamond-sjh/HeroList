@@ -200,7 +200,7 @@
       <td>{{$value.skill}}</td>
       <td>
         <button onclick="location.href=`./edit.html?id={{$value.id}}`"  class="btn btn-primary">编辑</button>
-        <button onclick="alert('你真狠')" class="btn btn-danger">删除</button>
+        <button data-id="{{$value.id}}" class="btn btn-danger">删除</button>
       </td>
     </tr>
     {{/each}}
@@ -212,7 +212,24 @@
         arr: res
       })
       $('tbody').html(str);
-    },'json')
+    }, 'json')
+  </script>
+
+  <!-- ----------------------------------------删除英雄 -->
+  <script>
+    $('body').on('click', '.btn-danger', function () {
+      if (confirm('确认删除？')) {
+        // 获取当前点击的删除按钮所在条目的ID
+        var id = $(this).attr('data-id');
+        var that = $(this);
+        $.get('/deleteHero', { id: id }, function (res) {
+          alert(res.message);
+          if (res.code == 200) {
+            that.parents('tr').remove();
+          }
+        })
+      }
+    })
   </script>
 
 </body>

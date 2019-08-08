@@ -83,7 +83,7 @@ app.post('/updateHero', upload.single('heroIcon'), function (req, res) {
     skill: req.body.skillName,
   }
   // 如果图片没有改动req.file的值为undefined,所以需要单独判断
-  if(req.file){
+  if (req.file) {
     values.file = req.file.path
   }
   db(sql, [values, id], (err, result) => {
@@ -91,6 +91,24 @@ app.post('/updateHero', upload.single('heroIcon'), function (req, res) {
       res.send({ code: 201, message: '修改失败' });
     } else {
       res.send({ code: 200, message: '修改成功' });
+    }
+  })
+})
+
+// 5.5  删除英雄信息
+app.get('/deleteHero', (req, res) => {
+  let id = req.query.id;
+  // 如果id为空或者不是数字类型的时候，参数错误，给出提示
+  if (!id || isNaN(id)) {
+    res.send('参数错误');
+    return;
+  }
+  let sql = 'delete from heroes where id = ?';
+  db(sql, id, (err, result) => {
+    if (err) {
+      res.send({ code: 201, message: '删除失败' })
+    } else {
+      res.send({ code: 200, message: '删除成功' })
     }
   })
 })
