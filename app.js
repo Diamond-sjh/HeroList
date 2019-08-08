@@ -22,14 +22,38 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 // 5、--------------------------------------------------各种接口
-// 5.1  获取所有的英雄信息
+// 5.1  分页获取所有的英雄信息
+// app.get('/getHeroes', (req, res) => {
+//   let sql = 'select * from heroes order by id desc';
+//   db(sql, null, (err, result) => {
+//     if (err) throw err;
+//     res.send(result);
+//   });
+// })
 app.get('/getHeroes', (req, res) => {
-  let sql = 'select * from heroes order by id desc';
+  let page = req.query.page || 1;
+  let pageNum = req.query.pageNum || 5;
+  console.log(pageNum);
+  console.log(page);
+
+  let sql = `select * from heroes order by id desc limit ${(page - 1) * pageNum} , ${pageNum};
+  select count(*) c from heroes`
   db(sql, null, (err, result) => {
     if (err) throw err;
-    res.send(result);
+    // console.log(result);
+    // return;
+    res.send({
+      data: result[0],
+      pageTotal: Math.ceil(result[1][0].c / pageNum)
+    });
   });
 })
+
+
+
+
+
+
 
 // 5.2  新增英雄
 const upload = multer({ dest: 'uploads/' });

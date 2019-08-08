@@ -161,19 +161,7 @@
               </table>
             </div>
             <div class="panel-footer text-center">
-              <ul class="pagination">
-                <li>
-                  <a href="#" aria-label="Previous">
-                    <span aria-hidden="true">«</span>
-                  </a>
-                </li>
-                <li class="page-num"><a href="#">1/1</a></li>
-                <li>
-                  <a href="#" aria-label="Next">
-                    <span aria-hidden="true">»</span>
-                  </a>
-                </li>
-              </ul>
+              <ul class="pagination" id="pagination"></ul>
             </div>
 
           </div>
@@ -187,6 +175,7 @@
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
   <script src="./lib/js/template-web.js"></script>
+  <script src="./lib/js/jquery.twbsPagination.min.js"></script>
 
 
   <!-- ----------------------------------刷新页面获取所有英雄信息 -->
@@ -207,12 +196,36 @@
   </script>
   <!-- 发送ajax请求到/getHeroes接口 -->
   <script>
-    $.get('/getHeroes', function (res) {
-      var str = template('tempHeroes', {
-        arr: res
-      })
-      $('tbody').html(str);
-    }, 'json')
+    var params = {
+      page: 1,
+      pageNum: 10
+    }
+    var flag = true;
+    function loadData() {
+      $.get('/getHeroes', params, function (res) {
+        var str = template('tempHeroes', {
+          arr: res.data
+        })
+        $('tbody').html(str);
+        if (flag == true) {
+          page(res.pageTotal);
+          flag = false;
+        }
+      }, 'json')
+    }
+    loadData();
+  </script>
+  <!-- 分页 -->
+  <script type="text/javascript">
+    function page(total) {
+      window.pagObj = $('#pagination').twbsPagination({
+        totalPages: total,
+        visiblePages: 10,
+      }).on('page', function (event, page) {
+        params.page = page;
+        loadData();
+      });
+    };
   </script>
 
   <!-- ----------------------------------------删除英雄 -->
