@@ -30,21 +30,28 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //     res.send(result);
 //   });
 // })
+// 5.1.1 新增模糊查询搜索功能
 app.get('/getHeroes', (req, res) => {
   let page = req.query.page || 1;
   let pageNum = req.query.pageNum || 5;
+
+  let keywords = req.query.keywords || null;
+  let values = '';
+  if (keywords) {
+    values = `where name like '%${keywords}%' or nickname like '%${keywords}%'`
+  }
   // console.log(pageNum);
   // console.log(page);
 
-  let sql = `select * from heroes order by id desc limit ${(page - 1) * pageNum} , ${pageNum};
-  select count(*) c from heroes`
+  let sql = `select * from heroes ${values} order by id desc limit ${(page - 1) * pageNum} , ${pageNum};
+  select count(*) c from heroes ${values}`
   db(sql, null, (err, result) => {
     if (err) throw err;
     // console.log(result);
     // return;
     res.send({
-      code:200,
-      message:'请求数据成功',
+      code: 200,
+      message: '请求数据成功',
       data: result[0],
       pageTotal: Math.ceil(result[1][0].c / pageNum)
     });
@@ -88,7 +95,7 @@ app.get('/getHeroById', (req, res) => {
   db(sql, id, (err, result) => {
     if (err) throw err;
     res.send(result[0]);  //  result的值是一个数组
-  }) 
+  })
 })
 
 // 5.4  修改英雄信息

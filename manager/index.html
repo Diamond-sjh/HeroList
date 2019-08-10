@@ -9,6 +9,8 @@
 
   <!-- Bootstrap -->
   <link href="./lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- 分页 -->
+  <link rel="stylesheet" href="./lib/css/jquery.pagination.css">
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -161,7 +163,8 @@
               </table>
             </div>
             <div class="panel-footer text-center">
-              <ul class="pagination" id="pagination"></ul>
+              <!-- <ul class="pagination" id="pagination"></ul> -->
+              <div id="pagination" class="page"></div>
             </div>
 
           </div>
@@ -176,6 +179,7 @@
   <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
   <script src="./lib/js/template-web.js"></script>
   <script src="./lib/js/jquery.twbsPagination.min.js"></script>
+  <script src="./lib/js/jquery.pagination.min.js"></script>
 
 
   <!-- ----------------------------------刷新页面获取所有英雄信息 -->
@@ -198,7 +202,8 @@
   <script>
     var params = {
       page: 1,
-      pageNum: 10
+      pageNum: 5,
+      keywords: null
     }
     var flag = true;
     function loadData() {
@@ -215,8 +220,27 @@
     }
     loadData();
   </script>
-  <!-- 分页 -->
-  <script type="text/javascript">
+
+
+  <!-- ------------------------------------------模糊查询 -->
+  <script>
+    $('.btn-default').click(function (e) {
+      e.preventDefault();
+      var keywords = $('.form-control').val().trim();
+      if (keywords == '') {
+        location.reload();
+        keywords = null;
+      }
+      params.keywords = keywords;
+      params.page = 1;
+      flag = true;
+      loadData();
+    })
+  </script>
+
+
+  <!-- 分页(模糊查询不能实现分页) -->
+  <!-- <script type="text/javascript">
     function page(total) {
       window.pagObj = $('#pagination').twbsPagination({
         totalPages: total,
@@ -226,7 +250,20 @@
         loadData();
       });
     };
+  </script> -->
+
+  <script>
+    function page(total) {
+      $("#pagination").pagination({
+        totalPage: total,
+        callback: function (current) {
+          params.page = current;
+          loadData();
+        }
+      });
+    };
   </script>
+
 
   <!-- ----------------------------------------删除英雄 -->
   <script>
@@ -244,6 +281,8 @@
       }
     })
   </script>
+
+
 
 </body>
 
