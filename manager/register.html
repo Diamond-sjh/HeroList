@@ -105,8 +105,45 @@
   <script src="./lib/bootstrap/js/jquery-1.12.4.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
-  <!-- 导入md5 -->
+  <!-- 导入md5(加密用) -->
   <script src="./lib/md5/md5.min.js"></script>
+
+
+  <script>
+    // 封装判断用户名函数
+    function userNameOk() {
+      $('.register').prop('disabled', false);
+      var userName = $('#username').val();
+      // console.log(userName);
+      // return;
+      $.post('/regNameOk', { username: userName }, function (res) {
+        // console.log(res);
+        alert(res.message);
+        if (res.code == 201) {
+          $('.register').prop('disabled', true);
+        }
+      }, 'json')
+    }
+    // 判断用户名是否已经被注册，给用户名输入框注册focusout事件
+    $('#username').focusout(userNameOk);
+    $( userNameOk); //  入口函数，页面刷新调用
+
+  </script>
+  <script>
+    // 点击注册按钮，获取表单数据，发送Ajax请求注册用户
+    $('.register').click(function () {
+      // var data = $('form').serialize(); //  username=lisi&password=123
+      var data = $('form').serializeArray();  //  [{name: 'username', value: 'zhangsan'}, {name: 'password', value: '123'}]
+      // 将密码进行加密处理
+      data[1].value = md5(data[1].value);
+      $.post('/regUser', data, function (res) {
+        alert(res.message);
+        if (res.code == 200) {
+          location.href = './login.html'
+        }
+      }, 'json');
+    })
+  </script>
 </body>
 
 </html>

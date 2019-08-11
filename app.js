@@ -23,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // 5、--------------------------------------------------各种接口
 // 5.1  分页获取所有的英雄信息
+
 // app.get('/getHeroes', (req, res) => {
 //   let sql = 'select * from heroes order by id desc';
 //   db(sql, null, (err, result) => {
@@ -57,12 +58,6 @@ app.get('/getHeroes', (req, res) => {
     });
   });
 })
-
-
-
-
-
-
 
 // 5.2  新增英雄
 const upload = multer({ dest: 'uploads/' });
@@ -145,3 +140,30 @@ app.get('/deleteHero', (req, res) => {
     }
   })
 })
+
+// 5.6  判断用户名是否被注册
+app.post('/regNameOk', (req, res) => {
+  let sql = `select username from user where username = ?`
+  // console.log(req.body);
+  db(sql, req.body.username, (err, result) => {
+    // console.log(result);
+    // console.log(err);
+    if (result != '') {
+      res.send({ code: 201, message: '该用户名已经被占用' })
+    }
+  })
+})
+
+// 5.7  用户注册
+app.post('/regUser', (req, res) => {
+  console.log(req.body);// [Object: null prototype] {username: 'zhangsan',password: '202cb962ac59075b964b07152d234b70' }
+  let sql = `insert into user set ?`
+  db(sql, req.body, (err, result) => {
+    if (err) {
+      res.send({ code: 201, message: '注册失败' });
+    } else {
+      res.send({ code: 200, message: '注册成功' });
+    }
+  })
+});
+
