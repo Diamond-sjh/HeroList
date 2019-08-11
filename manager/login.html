@@ -123,8 +123,6 @@
       e.preventDefault();
       var data = $('form').serializeArray();
       data[1].value = md5(data[1].value);
-      console.log(data);
-
       $.post('/userLogin', data, function (res) {
         alert(res.message)
         if (res.code == 200) {

@@ -214,12 +214,7 @@ app.post('/userLogin', (req, res) => {
     res.send({ code: 202, message: '验证码错误' })
   }
   let sql = `select * from user where username = ? and password = ?`
-  console.log(req.body.username);
-  console.log(req.body.password);
-  
   db(sql, [req.body.username, req.body.password], (err, result) => {
-    console.log(sql);
-    // return;
     if (err) throw err
     if (result.length > 0) {
       res.send({ code: 200, message: '登录成功' })
