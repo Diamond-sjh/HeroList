@@ -27,6 +27,9 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 // 4.2 处理urlencoded 编码格式的请求体
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// 4.3 cookie使用的中间件
+// app.use(cookieParser());
+
 
 // 5、--------------------------------------------------各种接口
 // 5.1  分页获取所有的英雄信息
@@ -203,11 +206,25 @@ app.get('/captcha', function (req, res) {
 app.post('/userLogin', (req, res) => {
   // console.log(req.header.cookie);
   // console.log(req.cookie);
-  
+
   // console.log(req.body.vcode);
   // console.log(req.session.captcha);
 
   if (req.body.vcode.toLocaleUpperCase() !== req.session.captcha.toLocaleUpperCase()) {
     res.send({ code: 202, message: '验证码错误' })
   }
+  let sql = `select * from user where username = ? and password = ?`
+  console.log(req.body.username);
+  console.log(req.body.password);
+  
+  db(sql, [req.body.username, req.body.password], (err, result) => {
+    console.log(sql);
+    // return;
+    if (err) throw err
+    if (result.length > 0) {
+      res.send({ code: 200, message: '登录成功' })
+    } else {
+      res.send({ code: 201, message: '账号密码错误' })
+    }
+  })
 })
