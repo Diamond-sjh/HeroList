@@ -28,7 +28,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // 4.3 cookie使用的中间件
-// app.use(cookieParser());
+app.use(cookieParser());
 
 
 // 5、--------------------------------------------------各种接口
@@ -181,12 +181,12 @@ app.post('/regUser', (req, res) => {
 // 5.8  生成验证码端口
 // 5.8.1  npm 安装 `npm i svg-captcha`可以去github.com网站去搜一下这个插件，然后将使用的代码复制到你的app.js中即可：
 // 5.8.2 配置session
-app.use(session({
-  secret: 'keyboard cat',
-  cookie: { maxAge: 60000 },
-  resave: false,
-  saveUninitialized: false
-}))
+// app.use(session({
+//   secret: 'keyboard cat',
+//   cookie: { maxAge: 60000 },
+//   resave: false,
+//   saveUninitialized: false
+// }))
 // 5.8.3 生成验证码的接口
 app.get('/captcha', function (req, res) {
   // var captcha = svgCaptcha.createMathExpr()// 使用数字之和当做验证码
@@ -194,8 +194,8 @@ app.get('/captcha', function (req, res) {
     color: true,
     background: '#ed52c9'
   });
-  req.session.captcha = captcha.text; // 把生成的验证码结果保存在session中
-  // res.cookie('captcha', 'sdad'); // 把生成的验证码结果保存在cookie中
+  // req.session.captcha = captcha.text; // 把生成的验证码结果保存在session中
+  res.cookie('captcha', captcha.text); // 把生成的验证码结果保存在cookie中
   // 输出验证码字符的结果：
   // console.log(captcha.text);
   res.type('svg');
@@ -204,13 +204,13 @@ app.get('/captcha', function (req, res) {
 
 // 5.9 登录接口
 app.post('/userLogin', (req, res) => {
-  // console.log(req.header.cookie);
+  // console.log(req.cookies.captcha);
   // console.log(req.cookie);
 
   // console.log(req.body.vcode);
-  // console.log(req.session.captcha);
-
-  if (req.body.vcode.toLocaleUpperCase() !== req.session.captcha.toLocaleUpperCase()) {
+  // return;
+  if (req.body.vcode.toLocaleUpperCase() !== req.cookies.captcha.toLocaleUpperCase()) {
+  // if (req.body.vcode.toLocaleUpperCase() !== req.session.captcha.toLocaleUpperCase()) {
     res.send({ code: 202, message: '验证码错误' })
   }
   let sql = `select * from user where username = ? and password = ?`
