@@ -5,6 +5,13 @@ const bodyParser = require('body-parser');
 const db = require('./db.js');
 // 1.2 添加英雄有文件,所以使用FormData上传,body-parser不能处理FormData的数据类型，所以使用multer模块
 const multer = require('multer');
+// 1.3 生成验证码模块
+const svgCaptcha = require('svg-captcha');
+// 1.4 设置cookie的模块
+const cookieParser = require('cookie-parser');
+// 1.5 设置session的模块
+const session = require('express-session');
+
 
 // 2、---------------创建服务器
 const app = express();
@@ -148,6 +155,7 @@ app.post('/regNameOk', (req, res) => {
   db(sql, req.body.username, (err, result) => {
     // console.log(result);
     // console.log(err);
+    if (err) throw err;
     if (result != '') {
       res.send({ code: 201, message: '该用户名已经被占用' })
     }
@@ -167,3 +175,26 @@ app.post('/regUser', (req, res) => {
   })
 });
 
+// 5.8  生成验证码端口
+// 5.8.1  npm 安装 `npm i svg-captcha`可以去github.com网站去搜一下这个插件，然后将使用的代码复制到你的app.js中即可：
+// 5.8.2 配置session
+// app.use(session({
+//   secret: 'keyboard cat',
+//   cookie: { maxAge: 60000 },
+//   resave: false,
+//   saveUninitialized: false
+// }))
+// 5.8.3 生成验证码的接口
+app.get('/captcha', function (req, res) {
+  // var captcha = svgCaptcha.createMathExpr()// 使用数字之和当做验证码
+  var captcha = svgCaptcha.create({
+    color: true,
+    background: '#ed52c9'
+  });
+  // req.session.captcha = captcha.text; // 把生成的验证码结果保存在session中
+  res.cookie('captcha', captcha.text, { maxAge: 60000 }); // 把生成的验证码结果保存在cookie中
+  // 输出验证码字符的结果：
+  // console.log(captcha.text);
+  res.type('svg');
+  res.status(200).send(captcha.data); // 响应给浏览器一张验证码“图片”
+});
