@@ -36,7 +36,7 @@ app.use(checkLoginSession);
 function checkLoginSession(req, res, next) {
   let params = url.parse(req.url, true)
   // console.log(params.pathname);
-  if (params.pathname != '/login.html' && params.pathname != '/register.html' && params.pathname != '/captcha') {
+  if (params.pathname != '/login.html' && params.pathname != '/userLogin' && params.pathname != '/register.html' && params.pathname != '/captcha' && params.pathname != '/regNameOk' && params.pathname != '/regUser') {
     if (!req.cookies.isLogin) {
       return res.redirect('/login.html')
     }

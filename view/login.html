@@ -126,7 +126,7 @@
       $.post('/userLogin', data, function (res) {
         alert(res.message)
         if (res.code == 200) {
-          location.href = './index.html'
+          location.href = '/'
         }
       }, 'json')
     })
