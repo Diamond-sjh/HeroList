@@ -8,7 +8,7 @@
   <title>Bootstrap 101 Template</title>
 
   <!-- Bootstrap -->
-  <link href="./lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../public/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -23,6 +23,7 @@
 
     .vCode {
       height: 36px;
+      cursor: pointer;
     }
 
     .wrap {
@@ -60,7 +61,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><img src="images/logo.png"></a>
+          <a class="navbar-brand" href="#"><img src="../public/images/logo.png"></a>
         </div>
       </div>
     </nav>
@@ -69,10 +70,10 @@
         <div class="col-md-6 col-md-offset-3">
           <div class="panel panel-default login-panel">
             <div class="panel-heading">
-              <h3 class="panel-title"><b>用户注册</b></h3>
+              <h3 class="panel-title"><b>用户登录</b></h3>
             </div>
             <div class="panel-body">
-              <form class="form-horizontal" method="post" action="">
+              <form action="#" method="post" class="form-horizontal">
                 <div class="form-group">
                   <label for="userName" class="col-sm-2 control-label">用户名</label>
                   <div class="col-sm-10">
@@ -85,13 +86,22 @@
                     <input type="password" name="password" class="form-control" id="password" placeholder="请输入密码" />
                   </div>
                 </div>
-
                 <div class="form-group">
-                  <div class="col-sm-offset-2 col-sm-4">
-                    <button type="button" class="btn btn-success register">
-                      注册
+                  <label for="vCode" class="col-sm-2 control-label">验证码</label>
+                  <div class="col-sm-6">
+                    <input type="text" name="vcode" class="form-control" id="vcode" placeholder="请输入验证码" />
+                  </div>
+                  <div class="col-sm-4">
+                    <!-- 设置验证码的路由地址即可 -->
+                    <img class="vCode" src="/captcha" onclick="this.src='/captcha?' + Date.now()" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-success login">
+                      登陆
                     </button>
-                    <a href="./login.html" class="btn btn-default">返回</a>
+                    <a href="./register.html" class="btn btn-default">注册</a>
                   </div>
                 </div>
               </form>
@@ -102,46 +112,23 @@
     </div>
   </div>
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="./lib/bootstrap/js/jquery-1.12.4.js"></script>
+  <script src="../public/bootstrap/js/jquery-1.12.4.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
-  <!-- 导入md5(加密用) -->
-  <script src="./lib/md5/md5.min.js"></script>
+  <script src="../public/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../public/md5/md5.min.js"></script>
 
-
+  <!-- 点击登录按钮，获取表单中的数据，发送ajax请求，与数据库的用户账号密码对照，相同则登陆成功 -->
   <script>
-    // 封装判断用户名函数
-    function userNameOk() {
-      $('.register').prop('disabled', false);
-      var userName = $('#username').val();
-      // console.log(userName);
-      // return;
-      $.post('/regNameOk', { username: userName }, function (res) {
-        // console.log(res);
-        alert(res.message);
-        if (res.code == 201) {
-          $('.register').prop('disabled', true);
+    $('.login').click(function (e) {
+      e.preventDefault();
+      var data = $('form').serializeArray();
+      data[1].value = md5(data[1].value);
+      $.post('/userLogin', data, function (res) {
+        alert(res.message)
+        if (res.code == 200) {
+          location.href = './index.html'
         }
       }, 'json')
-    }
-    // 判断用户名是否已经被注册，给用户名输入框注册focusout事件
-    $('#username').focusout(userNameOk);
-    $( userNameOk); //  入口函数，页面刷新调用
-
-  </script>
-  <script>
-    // 点击注册按钮，获取表单数据，发送Ajax请求注册用户
-    $('.register').click(function () {
-      // var data = $('form').serialize(); //  username=lisi&password=123
-      var data = $('form').serializeArray();  //  [{name: 'username', value: 'zhangsan'}, {name: 'password', value: '123'}]
-      // 将密码进行加密处理
-      data[1].value = md5(data[1].value);
-      $.post('/regUser', data, function (res) {
-        alert(res.message);
-        if (res.code == 200) {
-          location.href = './login.html'
-        }
-      }, 'json');
     })
   </script>
 </body>
