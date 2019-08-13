@@ -1,6 +1,7 @@
 // 1、---------------加载所需模块
 const express = require('express');
 const bodyParser = require('body-parser');
+const url = require('url')
 // 1.1 导入db.js
 const db = require('./db.js');
 // 1.2 添加英雄有文件,所以使用FormData上传,body-parser不能处理FormData的数据类型，所以使用multer模块
@@ -20,26 +21,28 @@ const app = express();
 app.listen(3000, () => console.log('开启服务'));
 
 // 4、---------------处理请求
-// 4.3 cookie使用的中间件
-app.use(cookieParser());
-
-
 // 4.1 处理静态资源的中间件
 app.use('/public', express.static(__dirname + '/public'));
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
 // 4.2 处理urlencoded 编码格式的请求体
 app.use(bodyParser.urlencoded({ extended: false }));
-// 4.0.1  限制登录
-// app.use(checkLoginSession);
-// function checkLoginSession(req, res, next) {
-//   if (req.url != '/login.html' && req.url != '/regUser') {
-//     if (!req.cookies.isLogin) {
-//       return res.redirect('/login.html')
-//     }
-//   }
-//   next()
-// }
+
+// 4.3 cookie使用的中间件
+app.use(cookieParser());
+
+// 4.4  限制登录
+app.use(checkLoginSession);
+function checkLoginSession(req, res, next) {
+  let params = url.parse(req.url, true)
+  // console.log(params.pathname);
+  if (params.pathname != '/login.html' && params.pathname != '/register.html' && params.pathname != '/captcha') {
+    if (!req.cookies.isLogin) {
+      return res.redirect('/login.html')
+    }
+  }
+  next()
+}
 
 
 // 5、--------------------------------------------------各种接口
@@ -77,9 +80,6 @@ app.get('/getHeroes', (req, res) => {
   if (keywords) {
     values = `where name like '%${keywords}%' or nickname like '%${keywords}%'`
   }
-  // console.log(pageNum);
-  // console.log(page);
-
   let sql = `select * from heroes ${values} order by id desc limit ${(page - 1) * pageNum} , ${pageNum};
   select count(*) c from heroes ${values}`
   db(sql, null, (err, result) => {
@@ -230,8 +230,8 @@ app.get('/captcha', function (req, res) {
 
 // 5.9 登录接口
 app.post('/userLogin', (req, res) => {
-  if (req.body.vcode.toLocaleUpperCase() !== req.cookies.captcha.toLocaleUpperCase()) {
-    // if (req.body.vcode.toLocaleUpperCase() !== req.session.captcha.toLocaleUpperCase()) {
+  if (req.body.vcode.toLocaleUpperCase() !== req.cookies.captcha.toLocaleUpperCase()) {   // cookie保存的验证码
+    // if (req.body.vcode.toLocaleUpperCase() !== req.session.captcha.toLocaleUpperCase()) {  //  session保存的验证码
     res.send({ code: 202, message: '验证码错误' })
   }
   let sql = `select * from user where username = ? and password = ?`
