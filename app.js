@@ -44,23 +44,31 @@ function checkLoginSession(req, res, next) {
   next()
 }
 
+// 4.5  处理静态页面资源==>等同4.6的接口
+app.use(express.static('view'));
+
+// 4.6 静态页面接口处理
+// app.get('/', (req, res) => {
+//   res.sendFile(__dirname + '/view/index.html')
+// })
+// app.get('/add.html', (req, res) => {
+//   res.sendFile(__dirname + '/view/add.html')
+// })
+// app.get('/edit.html', (req, res) => {
+//   res.sendFile(__dirname + '/view/edit.html')
+// })
+// app.get('/login.html', (req, res) => {
+//   res.sendFile(__dirname + '/view/login.html')
+// })
+// app.get('/register.html', (req, res) => {
+//   res.sendFile(__dirname + '/view/register.html')
+// })
+
+
+
 
 // 5、--------------------------------------------------各种接口
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/view/index.html')
-})
-app.get('/add.html', (req, res) => {
-  res.sendFile(__dirname + '/view/add.html')
-})
-app.get('/edit.html', (req, res) => {
-  res.sendFile(__dirname + '/view/edit.html')
-})
-app.get('/login.html', (req, res) => {
-  res.sendFile(__dirname + '/view/login.html')
-})
-app.get('/register.html', (req, res) => {
-  res.sendFile(__dirname + '/view/register.html')
-})
+
 // 5.1  分页获取所有的英雄信息
 
 // app.get('/getHeroes', (req, res) => {
@@ -232,7 +240,7 @@ app.get('/captcha', function (req, res) {
 app.post('/userLogin', (req, res) => {
   if (req.body.vcode.toLocaleUpperCase() !== req.cookies.captcha.toLocaleUpperCase()) {   // cookie保存的验证码
     // if (req.body.vcode.toLocaleUpperCase() !== req.session.captcha.toLocaleUpperCase()) {  //  session保存的验证码
-    res.send({ code: 202, message: '验证码错误' })
+    return res.send({ code: 202, message: '验证码错误' })
   }
   let sql = `select * from user where username = ? and password = ?`
   db(sql, [req.body.username, req.body.password], (err, result) => {
